@@ -1,6 +1,9 @@
 package com.ordermanagementservice.controllers;
 
+import com.ordermanagementservice.models.common.ErrorResponse;
 import com.ordermanagementservice.models.request.SubmitOrderRequest;
+import com.ordermanagementservice.models.response.order.FailedOrderResponse;
+import com.ordermanagementservice.models.response.order.OrderManagementResponse;
 import com.ordermanagementservice.models.response.order.OrderStatus;
 import com.ordermanagementservice.models.response.order.SubmittedOrderResponse;
 import com.ordermanagementservice.services.OrderProducerService;
@@ -10,10 +13,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.kafka.support.SendResult;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
 @RestController
@@ -24,21 +29,24 @@ public class SubmitOrderController {
     @Autowired
     private OrderProducerService orderProducerService;
 
-    @PostMapping(path = "/orders")
-    public CompletableFuture<ResponseEntity<SubmittedOrderResponse>> submitOrder(@RequestBody SubmitOrderRequest submitOrderRequest) {
-        CompletableFuture<SendResult<String, String >> producerResponse = orderProducerService.submitOrder(submitOrderRequest);
 
+    @PostMapping(path = "/product/{productId}/orders")
+    public CompletableFuture<ResponseEntity<OrderManagementResponse>> submitOrder(@PathVariable("productId") String productId, @RequestBody SubmitOrderRequest submitOrderRequest) {
+
+        // Generate random id for order
+        String orderId = UUID.randomUUID().toString();
+
+        // publish order event to kafka topic
+        CompletableFuture<SendResult<String, String >> producerResponse = orderProducerService.submitOrder(submitOrderRequest, orderId);
+
+        // whenever order is submitted, send response to user
         return producerResponse.thenApplyAsync(result -> {
-            SubmittedOrderResponse orderDataResponse = new SubmittedOrderResponse();
-            orderDataResponse.setOrderStatus(OrderStatus.SUBMITTED);
-            orderDataResponse.setProductInfo(submitOrderRequest.getProduct());
-            orderDataResponse.setUserInfo(submitOrderRequest.getUser());
-            orderDataResponse.setTotalCost(submitOrderRequest.getQuantity() * submitOrderRequest.getProduct().getPrice());
+            OrderManagementResponse orderDataResponse = new SubmittedOrderResponse(orderId, submitOrderRequest.getQuantity(), submitOrderRequest.getProduct(), submitOrderRequest.getUser());
             logger.info("method=submitOrder message=Order submitted");
             return ResponseEntity.status(HttpStatus.OK).body(orderDataResponse);
         }).exceptionally(ex -> {
-            SubmittedOrderResponse orderDataResponse = new SubmittedOrderResponse();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(orderDataResponse);
+            OrderManagementResponse failedOrderResponse = new FailedOrderResponse(new ErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR.name(), "Failed to submit order"), submitOrderRequest.getProduct(), submitOrderRequest.getUser());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(failedOrderResponse);
         });
     }
 }

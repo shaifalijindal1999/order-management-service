@@ -5,6 +5,8 @@ import com.ordermanagementservice.models.common.UserModels.User;
 
 public class SubmittedOrderResponse implements OrderManagementResponse {
 
+    String orderId;
+
     int quantity;
     Product productInfo;
     User userInfo;
@@ -15,7 +17,8 @@ public class SubmittedOrderResponse implements OrderManagementResponse {
 
     }
 
-    public SubmittedOrderResponse(int quantity, Product product, User user) {
+    public SubmittedOrderResponse(String id, int quantity, Product product, User user) {
+        this.orderId = id;
         this.quantity = quantity;
         this.productInfo = product;
         this.userInfo = user;

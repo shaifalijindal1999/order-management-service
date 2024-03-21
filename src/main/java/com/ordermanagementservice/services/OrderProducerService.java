@@ -26,17 +26,17 @@ public class OrderProducerService {
     @Autowired
     private KafkaTemplate<String, String> kafkaTemplate;
 
-    public CompletableFuture<SendResult<String, String>> submitOrder(SubmitOrderRequest request) {
+    public CompletableFuture<SendResult<String, String>> submitOrder(SubmitOrderRequest request, String orderId) {
 
         // generate uuid here
-        String randomUUID = UUID.randomUUID().toString();
 
-        SubmitOrderEvent orderEvent = new SubmitOrderEvent(randomUUID);
+
+        SubmitOrderEvent orderEvent = new SubmitOrderEvent(orderId);
 
 //        CompletableFuture<SendResult<String, Event>> future =
 //                this.template.send(TOPIC, orderEvent);
 
-        var future =  this.kafkaTemplate.send(TOPIC, randomUUID);
+        var future =  this.kafkaTemplate.send(TOPIC, orderId);
 
         future.whenComplete((result, ex) -> {
             if (ex == null) {
