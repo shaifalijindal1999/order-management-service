@@ -1,0 +1,41 @@
+package com.ordermanagementservice.models.common.UserModels;
+
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.*;
+import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
+
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+
+@Getter
+@Data
+public class User {
+    @NotNull(message = "User id is required")
+    @NotEmpty(message =  "User id is required")
+    String id;
+
+
+    @NotEmpty(message =  "User name is required")
+    String firstName;
+
+    String lastName;
+
+    @Email(message = "The email address is invalid.", flags = { Pattern.Flag.CASE_INSENSITIVE })
+    String emailAddress;
+
+    @Past(message = "Date of birth should be in past")
+    Date dateOfBirth;
+
+    @Valid
+    @NotNull(message = "The address is required.")
+    ShippingDetails address;
+
+    Map<String, String> attributes; // user device info, user device os,
+
+    User() {
+        attributes = new HashMap<>();
+    }
+}

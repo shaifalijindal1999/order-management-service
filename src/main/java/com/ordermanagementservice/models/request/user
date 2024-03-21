@@ -1,0 +1,42 @@
+package com.ordermanagementservice.models.request;
+
+import com.ordermanagementservice.models.common.ProductModels.Product;
+import com.ordermanagementservice.models.common.UserModels.User;
+import jakarta.validation.constraints.NotNull;
+import lombok.Data;
+import lombok.Getter;
+
+@Getter
+@Data
+public class OrderDto {
+
+    @NotNull(message = "[Quantity] Quantity info is required.")
+    int quantity;
+
+    @NotNull(message = "[ProductInfo] Product info is required.")
+    Product product;
+
+    @NotNull(message = "[UserInfo] User info is required.")
+    User user;
+
+    OrderDto(Product productInfo, User userInfo, int quantity) {
+        this.product = productInfo;
+        this.user = userInfo;
+        this.quantity = quantity;
+    }
+
+    public void setQuantity(int quantity) {
+        this.quantity = quantity;
+    }
+
+    public void setProduct(Product product) {
+        this.product = product;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+}
+
+
+

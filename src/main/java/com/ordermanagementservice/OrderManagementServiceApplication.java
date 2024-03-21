@@ -1,21 +1,34 @@
 package com.ordermanagementservice;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.kafka.annotation.DltHandler;
+import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.kafka.support.KafkaHeaders;
+import org.springframework.messaging.handler.annotation.Header;
 
 @SpringBootApplication
-@RestController
 public class OrderManagementServiceApplication {
+
+    private final Logger logger = LoggerFactory.getLogger(OrderManagementServiceApplication.class);
 
     public static void main(String[] args) {
         SpringApplication.run(OrderManagementServiceApplication.class, args);
     }
 
-    @GetMapping("/hello")
-    public String sayHello(@RequestParam(value = "myName", defaultValue = "World") String name) {
-        return String.format("Hello %s!", name);
+    @KafkaListener(id = "order-acceptance-group", topics = "order-topic")
+    public void listen(String in, @Header(KafkaHeaders.RECEIVED_TOPIC) String topic,
+                       @Header(KafkaHeaders.OFFSET) long offset) {
+
+        this.logger.info("Received: {} from {} @ {}", in, topic, offset);
     }
+
+//    @DltHandler
+//    public void listenDlt(String in, @Header(KafkaHeaders.RECEIVED_TOPIC) String topic,
+//                          @Header(KafkaHeaders.OFFSET) long offset) {
+//
+//        this.logger.info("DLT Received: {} from {} @ {}", in, topic, offset);
+//    }
 }
