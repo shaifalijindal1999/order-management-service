@@ -5,6 +5,10 @@ import java.util.HashMap;
 
 public class Product {
 
+    private String id;
+    private String name;
+    private String description;
+    private float price;
 
     public void setId(String id) {
         this.id = id;
@@ -21,27 +25,9 @@ public class Product {
     public void setPrice(float price) {
         this.price = price;
     }
-
-    public void setQuantity(int quantity) {
-        this.quantity = quantity;
-    }
-
     public void setAttributes(HashMap<String, String> attributes) {
         this.attributes = attributes;
     }
-
-    private String id;
-
-
-    private String name;
-
-
-    private String description;
-
-
-    private float price;
-
-    private int quantity;
 
     private HashMap<String, String> attributes;
 
@@ -61,10 +47,6 @@ public class Product {
         return price;
     }
 
-    public int getQuantity() {
-        return quantity;
-    }
-
     public HashMap<String, String> getAttributes() {
         return attributes;
     }
@@ -79,6 +61,11 @@ public class Product {
 
         public ProductInnerClass setName(String name) {
             this.productInfo.setName(name);
+            return this;
+        }
+
+        public ProductInnerClass setPrice(float price) {
+            this.productInfo.setPrice(price);
             return this;
         }
 

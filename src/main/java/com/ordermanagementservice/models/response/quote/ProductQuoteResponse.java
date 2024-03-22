@@ -6,16 +6,24 @@ public class ProductQuoteResponse implements QuoteResponse {
 
     private Product product;
 
+    private int requestedQuantity;
+
     private float amountToBePaid;
 
-    // Constructors
-    public ProductQuoteResponse(Product product) {
-        this.product = product;
+    public int getRequestedQuantity() {
+        return requestedQuantity;
     }
 
-    public void calculatePayableAmount(int requestedQuantity) {
-        this.setAmountToBePaid(this.product.getPrice() * requestedQuantity);
+    public void setRequestedQuantity(int requestedQuantity) {
+        this.requestedQuantity = requestedQuantity;
     }
+
+    // Constructors
+    public ProductQuoteResponse(Product product, int requestedQuantity) {
+        this.product = product;
+        this.requestedQuantity = requestedQuantity;
+    }
+
 
     public Product getProduct() {
         return product;
@@ -29,8 +37,8 @@ public class ProductQuoteResponse implements QuoteResponse {
         return amountToBePaid;
     }
 
-    public void setAmountToBePaid(float amountToBePaid) {
-        this.amountToBePaid = amountToBePaid;
+    public void setAmountToBePaid() {
+        this.amountToBePaid = this.product.getPrice() * this.requestedQuantity;
     }
 }
 

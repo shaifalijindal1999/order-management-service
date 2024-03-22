@@ -29,8 +29,8 @@ public class SubmittedOrderResponse implements OrderManagementResponse {
         this.totalCost = calculatePayableAmount();
     }
 
-    private int calculatePayableAmount() {
-        return this.quantity * this.productInfo.getQuantity();
+    private float calculatePayableAmount() {
+        return this.quantity * this.productInfo.getPrice();
     }
 
     public int getQuantity() {

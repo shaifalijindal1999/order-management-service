@@ -1,12 +1,17 @@
 package com.ordermanagementservice.models.common.UserModels;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import org.springframework.lang.NonNull;
+
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
 public class User {
     String id;
-
 
     String firstName;
 
@@ -20,9 +25,10 @@ public class User {
 
     Map<String, String> attributes; // user device info, user device os,
 
-    User() {
+    public User() {
         attributes = new HashMap<>();
     }
+
 
     public String getId() {
         return id;
