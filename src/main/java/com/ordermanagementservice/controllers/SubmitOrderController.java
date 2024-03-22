@@ -1,5 +1,6 @@
 package com.ordermanagementservice.controllers;
 
+import com.ordermanagementservice.constants.Constants;
 import com.ordermanagementservice.models.common.ErrorResponse;
 import com.ordermanagementservice.models.request.SubmitOrderRequest;
 import com.ordermanagementservice.models.response.order.FailedOrderResponse;
@@ -37,15 +38,28 @@ public class SubmitOrderController {
         String orderId = UUID.randomUUID().toString();
 
         // publish order event to kafka topic
-        CompletableFuture<SendResult<String, String >> producerResponse = orderProducerService.submitOrder(submitOrderRequest, orderId);
+        CompletableFuture<Constants.StatusMessages> producerResponse =
+                orderProducerService.submitOrder(submitOrderRequest, orderId);
 
         // whenever order is submitted, send response to user
         return producerResponse.thenApplyAsync(result -> {
-            OrderManagementResponse orderDataResponse = new SubmittedOrderResponse(orderId, submitOrderRequest.getQuantity(), submitOrderRequest.getProduct(), submitOrderRequest.getUser());
-            logger.info("method=submitOrder message=Order submitted");
-            return ResponseEntity.status(HttpStatus.OK).body(orderDataResponse);
+
+            if (Constants.StatusMessages.SUBMITTED == result) {
+                OrderManagementResponse orderDataResponse =
+                        new SubmittedOrderResponse(orderId, submitOrderRequest.getQuantity(), submitOrderRequest.getProduct(),
+                                submitOrderRequest.getUser(), productId);
+                logger.info("method=submitOrder message=Order submitted");
+                return ResponseEntity.status(HttpStatus.OK).body(orderDataResponse);
+            }
+            else {
+                OrderManagementResponse failedOrderResponse = new FailedOrderResponse(new ErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR.name(), "Failed to submit order"), submitOrderRequest.getProduct(), submitOrderRequest.getUser(), productId);
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(failedOrderResponse);
+            }
         }).exceptionally(ex -> {
-            OrderManagementResponse failedOrderResponse = new FailedOrderResponse(new ErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR.name(), "Failed to submit order"), submitOrderRequest.getProduct(), submitOrderRequest.getUser());
+            OrderManagementResponse failedOrderResponse =
+                    new FailedOrderResponse(new ErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR.name(),
+                            "Error occurred while submitting order"),
+                            submitOrderRequest.getProduct(), submitOrderRequest.getUser(), productId);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(failedOrderResponse);
         });
     }

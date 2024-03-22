@@ -3,42 +3,31 @@ package com.ordermanagementservice.models.response.order;
 import com.ordermanagementservice.models.common.ErrorResponse;
 import com.ordermanagementservice.models.common.ProductModels.Product;
 import com.ordermanagementservice.models.common.UserModels.User;
+import lombok.Getter;
 
 public class FailedOrderResponse implements OrderManagementResponse {
 
     ErrorResponse errorResponse;
+    String productName;
+    String productId;
 
-    Product productInfo;
+    User user;
 
-    User userInfo;
+    OrderStatus orderStatus;
 
-    public FailedOrderResponse(ErrorResponse errorResponse, Product product, User user) {
+    public FailedOrderResponse(ErrorResponse errorResponse, Product product, User user, String productId) {
         this.errorResponse = errorResponse;
-        this.productInfo = product;
-        this.userInfo = user;
-    }
-
-    public ErrorResponse getErrorResponse() {
-        return errorResponse;
+        this.productName = product.getName();
+        this.productId = productId;
+        this.user = user;
+        this.orderStatus = OrderStatus.NOT_SUBMITTED;
     }
 
     public void setErrorResponse(ErrorResponse errorResponse) {
         this.errorResponse = errorResponse;
     }
 
-    public Product getProductInfo() {
-        return productInfo;
-    }
-
-    public void setProductInfo(Product productInfo) {
-        this.productInfo = productInfo;
-    }
-
-    public User getUserInfo() {
-        return userInfo;
-    }
-
-    public void setUserInfo(User userInfo) {
-        this.userInfo = userInfo;
+    public void setUser(User user) {
+        this.user = user;
     }
 }

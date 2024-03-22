@@ -1,6 +1,5 @@
 package com.ordermanagementservice.controllers;
 
-import com.ordermanagementservice.database.schema.CustomerData;
 import com.ordermanagementservice.models.response.quote.QuoteResponse;
 import com.ordermanagementservice.repositories.CustomerDataRepository;
 import com.ordermanagementservice.services.ProductQuoteService;
@@ -13,8 +12,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.Iterator;
 
 @RestController
 public class GetProductQuoteController {
@@ -32,17 +29,6 @@ public class GetProductQuoteController {
     getProductQuote(@PathVariable("productId") String productId,
                     @RequestParam(value = "quantity",
                             required = false, defaultValue = "1") int quantity) {
-
-//        CustomerData n = new CustomerData();
-//        n.setId("1");
-//        n.setName("Shaifali");
-//        n.setEmail("shaifalijindal1999@gmail.com");
-//        customerDataRepository.save(n);
-
-
-//        Iterable<CustomerData> allData = customerDataRepository.findAll();
-
-//        logger.info(allData.toString());
 
         QuoteResponse productQuoteResponse =
                 productQuoteService.getProductQuote(productId, quantity);

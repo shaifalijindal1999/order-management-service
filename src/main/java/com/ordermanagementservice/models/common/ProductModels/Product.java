@@ -10,6 +10,16 @@ public class Product {
     private String description;
     private float price;
 
+    private int requestedQuantity;
+
+    public int getRequestedQuantity() {
+        return requestedQuantity;
+    }
+
+    public void setRequestedQuantity(int requestedQuantity) {
+        this.requestedQuantity = requestedQuantity;
+    }
+
     public void setId(String id) {
         this.id = id;
     }
@@ -66,6 +76,11 @@ public class Product {
 
         public ProductInnerClass setPrice(float price) {
             this.productInfo.setPrice(price);
+            return this;
+        }
+
+        public ProductInnerClass setRequestedQuantity(int requestedQuantity) {
+            this.productInfo.setRequestedQuantity(requestedQuantity);
             return this;
         }
 

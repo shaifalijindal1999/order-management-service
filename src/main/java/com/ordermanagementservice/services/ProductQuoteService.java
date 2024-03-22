@@ -38,10 +38,16 @@ public class ProductQuoteService {
         }
 
         Product productInfo = Product.
-                builder().setId(id).setName(productData.getName()).setPrice(productData.getPrice()).build();
+                builder()
+                .setId(id)
+                .setName(productData.getName())
+                .setPrice(productData.getPrice())
+                .setRequestedQuantity(requestedQuantity)
+                .build();
 
         ProductQuoteResponse productQuoteResponse = new ProductQuoteResponse(productInfo, requestedQuantity);
         productQuoteResponse.setAmountToBePaid();
+
         return productQuoteResponse;
     }
 }
