@@ -1,7 +1,9 @@
 package com.ordermanagementservice.models.response.quote;
 
 import com.ordermanagementservice.models.common.ErrorResponse;
+import lombok.Getter;
 
+@Getter
 public class FailedQuoteResponse implements QuoteResponse {
     ErrorResponse errorResponse;
 
@@ -15,27 +17,27 @@ public class FailedQuoteResponse implements QuoteResponse {
         this.requestQuantity = requestQuantity;
     }
 
-    public ErrorResponse getErrorResponse() {
-        return errorResponse;
-    }
-
     public void setErrorResponse(ErrorResponse errorResponse) {
         this.errorResponse = errorResponse;
-    }
-
-    public String getProductId() {
-        return productId;
     }
 
     public void setProductId(String productId) {
         this.productId = productId;
     }
 
-    public int getRequestQuantity() {
-        return requestQuantity;
-    }
-
     public void setRequestQuantity(int requestQuantity) {
         this.requestQuantity = requestQuantity;
+    }
+
+    public ErrorResponse getErrorResponse() {
+        return errorResponse;
+    }
+
+    public String getProductId() {
+        return productId;
+    }
+
+    public int getRequestQuantity() {
+        return requestQuantity;
     }
 }

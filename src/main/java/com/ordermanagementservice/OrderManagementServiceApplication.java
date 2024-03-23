@@ -17,18 +17,4 @@ public class OrderManagementServiceApplication {
     public static void main(String[] args) {
         SpringApplication.run(OrderManagementServiceApplication.class, args);
     }
-
-    @KafkaListener(id = "order-acceptance-group", topics = "order-topic")
-    public void listen(String in, @Header(KafkaHeaders.RECEIVED_TOPIC) String topic,
-                       @Header(KafkaHeaders.OFFSET) long offset) {
-
-        this.logger.info("Received: {} from {} @ {}", in, topic, offset);
-    }
-
-//    @DltHandler
-//    public void listenDlt(String in, @Header(KafkaHeaders.RECEIVED_TOPIC) String topic,
-//                          @Header(KafkaHeaders.OFFSET) long offset) {
-//
-//        this.logger.info("DLT Received: {} from {} @ {}", in, topic, offset);
-//    }
 }

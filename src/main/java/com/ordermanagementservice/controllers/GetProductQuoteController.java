@@ -19,9 +19,6 @@ public class GetProductQuoteController {
     private final Logger logger = LoggerFactory.getLogger(GetProductQuoteController.class);
 
     @Autowired
-    private CustomerDataRepository customerDataRepository;
-
-    @Autowired
     private ProductQuoteService productQuoteService;
 
     @GetMapping("/product/{productId}/price")

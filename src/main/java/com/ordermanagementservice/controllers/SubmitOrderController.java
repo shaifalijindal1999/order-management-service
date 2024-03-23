@@ -1,5 +1,7 @@
 package com.ordermanagementservice.controllers;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ordermanagementservice.constants.Constants;
 import com.ordermanagementservice.models.request.SubmitOrderRequest;
 import com.ordermanagementservice.models.response.order.OrderManagementResponse;
@@ -16,6 +18,8 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
+import static org.apache.logging.log4j.message.MapMessage.MapFormat.JSON;
+
 @RestController
 public class SubmitOrderController {
 
@@ -29,7 +33,7 @@ public class SubmitOrderController {
 
 
     @PostMapping(path = "/submit")
-    public CompletableFuture<ResponseEntity<OrderManagementResponse>> submitOrder(@RequestBody SubmitOrderRequest submitOrderRequest) {
+    public CompletableFuture<ResponseEntity<OrderManagementResponse>> submitOrder(@RequestBody SubmitOrderRequest submitOrderRequest) throws JsonProcessingException {
 
         // Generate random id for order
         String orderId = UUID.randomUUID().toString();

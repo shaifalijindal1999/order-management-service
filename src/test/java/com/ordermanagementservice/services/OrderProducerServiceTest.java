@@ -1,5 +1,6 @@
 package com.ordermanagementservice.services;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ordermanagementservice.constants.Constants;
 import com.ordermanagementservice.models.common.ProductModels.Product;
 import com.ordermanagementservice.models.request.SubmitOrderRequest;
@@ -46,6 +47,9 @@ class OrderProducerServiceTest {
         // Arrange
         SubmitOrderRequest request = createSubmitOrderRequest();
 
+        ObjectMapper mapper = new ObjectMapper();
+        String payload = mapper.writeValueAsString(request);
+
         CompletableFuture<Constants.StatusMessages> expectedResult =
                 CompletableFuture.completedFuture(Constants.StatusMessages.SUBMITTED);
 
@@ -59,7 +63,7 @@ class OrderProducerServiceTest {
 
         // Assert
         assertEquals(expectedResult.get(), result.get());
-        verify(kafkaTemplate).send(eq(Constants.KAFKA_TOPIC), eq(mockOrderId));
+        verify(kafkaTemplate).send(eq(Constants.KAFKA_TOPIC), eq(mockOrderId + "_" + payload));
     }
 
     @Test
@@ -67,6 +71,9 @@ class OrderProducerServiceTest {
 
         // Arrange
         SubmitOrderRequest request = createSubmitOrderRequest();
+
+        ObjectMapper mapper = new ObjectMapper();
+        String payload = mapper.writeValueAsString(request);
 
         CompletableFuture<Constants.StatusMessages> expectedResult =
                 CompletableFuture.completedFuture(Constants.StatusMessages.NOT_SUBMITTED);
@@ -79,7 +86,7 @@ class OrderProducerServiceTest {
 
         // Assert
         assertEquals(expectedResult.get(), result.get());
-        verify(kafkaTemplate).send(eq(Constants.KAFKA_TOPIC), eq(mockOrderId));
+        verify(kafkaTemplate).send(eq(Constants.KAFKA_TOPIC), eq(mockOrderId + "_" + payload));
     }
 
 

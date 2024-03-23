@@ -1,5 +1,6 @@
 package com.ordermanagementservice.services;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ordermanagementservice.constants.Constants;
 import com.ordermanagementservice.models.request.SubmitOrderRequest;
 import org.slf4j.Logger;
@@ -34,8 +35,14 @@ public class OrderProducerService {
             throw e;
         }
 
+        ObjectMapper ow = new ObjectMapper();
+
+        String record = ow.writeValueAsString(request);
+
+        logger.info(record);
+
         // publish order to kafka to topic asynchronously if request is valid
-        var future =  this.kafkaTemplate.send(KAFKA_TOPIC, orderId);
+        var future =  this.kafkaTemplate.send(KAFKA_TOPIC, orderId + "_" + record);
         CompletableFuture<Constants.StatusMessages> submitResult = new CompletableFuture<>();
 
         future.whenComplete((result, ex) -> {
