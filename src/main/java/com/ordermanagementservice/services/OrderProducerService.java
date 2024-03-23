@@ -20,9 +20,21 @@ public class OrderProducerService {
     @Autowired
     KafkaTemplate<String, String> kafkaTemplate;
 
-    public CompletableFuture<Constants.StatusMessages> submitOrder(SubmitOrderRequest request, String orderId) {
+    @Autowired
+    RequestValidator submitOrderRequestValidator;
 
-        // publish order to kafka to topic asynchronously
+    public CompletableFuture<Constants.StatusMessages> submitOrder(SubmitOrderRequest request, String orderId) throws Exception {
+
+        // validate incoming request and complete with exception if request is invalid
+        try {
+            submitOrderRequestValidator = new SubmitOrderRequestValidator(request);
+            submitOrderRequestValidator.validateRequest(request);
+        } catch (Exception e) {
+            logger.error("method=submitOrder message={}", e.getMessage());
+            throw e;
+        }
+
+        // publish order to kafka to topic asynchronously if request is valid
         var future =  this.kafkaTemplate.send(KAFKA_TOPIC, orderId);
         CompletableFuture<Constants.StatusMessages> submitResult = new CompletableFuture<>();
 

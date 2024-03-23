@@ -1,20 +1,14 @@
 package com.ordermanagementservice.controllers;
 
 import com.ordermanagementservice.constants.Constants;
-import com.ordermanagementservice.models.common.ErrorResponse;
 import com.ordermanagementservice.models.request.SubmitOrderRequest;
-import com.ordermanagementservice.models.response.order.FailedOrderResponse;
 import com.ordermanagementservice.models.response.order.OrderManagementResponse;
-import com.ordermanagementservice.models.response.order.OrderStatus;
-import com.ordermanagementservice.models.response.order.SubmittedOrderResponse;
 import com.ordermanagementservice.services.OrderProducerService;
+import com.ordermanagementservice.utilities.builders.SubmitOrderResponseBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.kafka.support.SendResult;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -30,37 +24,36 @@ public class SubmitOrderController {
     @Autowired
     private OrderProducerService orderProducerService;
 
+    @Autowired
+    private SubmitOrderResponseBuilder submitOrderResponseBuilder;
 
-    @PostMapping(path = "/product/{productId}/orders")
-    public CompletableFuture<ResponseEntity<OrderManagementResponse>> submitOrder(@PathVariable("productId") String productId, @RequestBody SubmitOrderRequest submitOrderRequest) {
+
+    @PostMapping(path = "/submit")
+    public CompletableFuture<ResponseEntity<OrderManagementResponse>> submitOrder(@RequestBody SubmitOrderRequest submitOrderRequest) {
 
         // Generate random id for order
         String orderId = UUID.randomUUID().toString();
 
-        // publish order event to kafka topic
-        CompletableFuture<Constants.StatusMessages> producerResponse =
-                orderProducerService.submitOrder(submitOrderRequest, orderId);
+        try {
+            // publish order event to kafka topic
+            CompletableFuture<Constants.StatusMessages> producerResponse =
+                    orderProducerService.submitOrder(submitOrderRequest, orderId);
 
-        // whenever order is submitted, send response to user
-        return producerResponse.thenApplyAsync(result -> {
-
-            if (Constants.StatusMessages.SUBMITTED == result) {
-                OrderManagementResponse orderDataResponse =
-                        new SubmittedOrderResponse(orderId, submitOrderRequest.getQuantity(), submitOrderRequest.getProduct(),
-                                submitOrderRequest.getUser(), productId);
-                logger.info("method=submitOrder message=Order submitted");
-                return ResponseEntity.status(HttpStatus.OK).body(orderDataResponse);
-            }
-            else {
-                OrderManagementResponse failedOrderResponse = new FailedOrderResponse(new ErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR.name(), "Failed to submit order"), submitOrderRequest.getProduct(), submitOrderRequest.getUser(), productId);
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(failedOrderResponse);
-            }
-        }).exceptionally(ex -> {
-            OrderManagementResponse failedOrderResponse =
-                    new FailedOrderResponse(new ErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR.name(),
-                            "Error occurred while submitting order"),
-                            submitOrderRequest.getProduct(), submitOrderRequest.getUser(), productId);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(failedOrderResponse);
-        });
+            // whenever order is submitted, send response to user
+            return producerResponse.thenApplyAsync(result -> {
+                if (Constants.StatusMessages.SUBMITTED == result) {
+                    logger.info("method=submitOrder message=Order submitted!");
+                    return submitOrderResponseBuilder.
+                            buildSubmitSuccessResponse(submitOrderRequest, orderId);
+                }
+                else {
+                    return submitOrderResponseBuilder.
+                            buildSubmitInternalServerErrorResponse(submitOrderRequest, "Failed to submit order!", orderId);
+                }
+            }).exceptionally(ex -> submitOrderResponseBuilder.buildSubmitInternalServerErrorResponse(submitOrderRequest, ex.getMessage(), orderId));
+        } catch (Exception e) {
+            return submitOrderResponseBuilder.
+                    buildSubmitBadRequestErrorResponse(submitOrderRequest, e.getMessage(), orderId);
+        }
     }
 }
