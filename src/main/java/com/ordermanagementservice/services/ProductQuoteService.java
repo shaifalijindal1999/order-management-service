@@ -1,28 +1,23 @@
 package com.ordermanagementservice.services;
 
-import com.ordermanagementservice.database.schema.ProductData;
-import com.ordermanagementservice.models.common.ErrorResponse;
 import com.ordermanagementservice.models.common.ProductModels.Product;
 import com.ordermanagementservice.models.common.ProductModels.ProductInfo;
 import com.ordermanagementservice.models.response.quote.FailedQuoteResponse;
 import com.ordermanagementservice.models.response.quote.ProductQuoteResponse;
 import com.ordermanagementservice.models.response.quote.QuoteResponse;
-import com.ordermanagementservice.repositories.ProductDataRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
-import java.util.Optional;
-
 @Service
 public class ProductQuoteService {
 
-    @Autowired
-    ProductDataRepository productDataRepository;
+    @Value("${inventory.service.base-url}")
+    public String inventoryServiceUri;
     public QuoteResponse getProductQuote(String id, int requestedQuantity) {
 
-        WebClient webClient = WebClient.create("http://localhost:8888");
+        WebClient webClient = WebClient.create(inventoryServiceUri);
 
         Mono<ProductInfo> productResponseMono = webClient.get()
                 .uri(uriBuilder -> uriBuilder
@@ -48,10 +43,9 @@ public class ProductQuoteService {
                 return productQuoteResponse;
             }
             else {
-                FailedQuoteResponse failedQuoteResponse = new FailedQuoteResponse(productResponse.getErrorResponse(),
+                return new FailedQuoteResponse(productResponse.getErrorResponse(),
                         productResponse.getId(),
                         requestedQuantity);
-                return failedQuoteResponse;
             }
 
         }).block();

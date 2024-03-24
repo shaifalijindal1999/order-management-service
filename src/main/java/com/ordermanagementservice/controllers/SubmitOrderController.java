@@ -1,7 +1,6 @@
 package com.ordermanagementservice.controllers;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ordermanagementservice.constants.Constants;
 import com.ordermanagementservice.models.request.SubmitOrderRequest;
 import com.ordermanagementservice.models.response.order.OrderManagementResponse;
@@ -17,8 +16,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
-
-import static org.apache.logging.log4j.message.MapMessage.MapFormat.JSON;
 
 @RestController
 public class SubmitOrderController {
@@ -46,7 +43,7 @@ public class SubmitOrderController {
             // whenever order is submitted, send response to user
             return producerResponse.thenApplyAsync(result -> {
                 if (Constants.StatusMessages.SUBMITTED == result) {
-                    logger.info("method=submitOrder message=Order submitted!");
+                    logger.info("method=submitOrder message=Order successfully submitted to kafka");
                     return submitOrderResponseBuilder.
                             buildSubmitSuccessResponse(submitOrderRequest, orderId);
                 }

@@ -35,7 +35,6 @@ public class SubmitOrderResponseBuilder {
     public ResponseEntity<OrderManagementResponse> buildSubmitSuccessResponse(SubmitOrderRequest request, String orderId) {
         SubmittedOrderResponse orderDataResponse =
                 new SubmittedOrderResponse(orderId);
-        orderDataResponse.setTotalCost(request);
         return ResponseEntity.status(HttpStatus.OK).body(orderDataResponse);
 
     }

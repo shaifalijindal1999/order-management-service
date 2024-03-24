@@ -12,38 +12,44 @@ public class SubmittedOrderResponse implements OrderManagementResponse {
 
     String orderId;
 
-    float totalCost;
-
     OrderStatus orderStatus;
 
     public SubmittedOrderResponse(String id) {
         this.orderId = id;
         this.orderStatus = OrderStatus.SUBMITTED;
-        this.totalCost = 0;
     }
 
     public SubmittedOrderResponse(String id, ErrorResponse errorResponse) {
         this.errorResponse = errorResponse;
         this.orderId = id;
         this.orderStatus = OrderStatus.NOT_SUBMITTED;
-        this.totalCost = 0;
 
     }
     public void setFailedOrderResponse(ErrorResponse errorResponse) {
         this.errorResponse = errorResponse;
     }
 
-    public void setTotalCost(SubmitOrderRequest request) {
-        for (Product product : request.getProductList()) {
-            if (product.getRequestedQuantity() == 0) {
-                this.totalCost += product.getPrice();
-            }
-            this.totalCost += product.getPrice() * product.getRequestedQuantity();
-        }
-
-    }
-
     public void setOrderStatus(OrderStatus orderStatus) {
         this.orderStatus = orderStatus;
+    }
+
+    public ErrorResponse getErrorResponse() {
+        return errorResponse;
+    }
+
+    public void setErrorResponse(ErrorResponse errorResponse) {
+        this.errorResponse = errorResponse;
+    }
+
+    public String getOrderId() {
+        return orderId;
+    }
+
+    public void setOrderId(String orderId) {
+        this.orderId = orderId;
+    }
+
+    public OrderStatus getOrderStatus() {
+        return orderStatus;
     }
 }

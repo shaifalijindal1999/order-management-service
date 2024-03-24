@@ -1,7 +1,6 @@
 package com.ordermanagementservice.controllers;
 
 import com.ordermanagementservice.models.response.quote.QuoteResponse;
-import com.ordermanagementservice.repositories.CustomerDataRepository;
 import com.ordermanagementservice.services.ProductQuoteService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

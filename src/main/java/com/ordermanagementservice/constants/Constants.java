@@ -3,6 +3,10 @@ package com.ordermanagementservice.constants;
 public class Constants {
     public static final String KAFKA_TOPIC = "order-topic";
 
+    public static final int KAFKA_PARTITIONS = 10;
+
+    public static final int KAFKA_REPLICAS = 1;
+
     public enum StatusMessages {
         SUBMITTED("Order successfully submitted!"),
         NOT_SUBMITTED("Failed to submit order"),

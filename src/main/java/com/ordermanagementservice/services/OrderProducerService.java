@@ -47,7 +47,7 @@ public class OrderProducerService {
 
         future.whenComplete((result, ex) -> {
             if (ex == null) {
-                logger.info("method=submitOrder message=order successfully submitted");
+                logger.info("method=submitOrder message=Order successfully submitted to kafka topic!");
                 future.complete(result);
                 submitResult.complete(Constants.StatusMessages.SUBMITTED);
             }

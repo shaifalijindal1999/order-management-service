@@ -1,10 +1,8 @@
 package com.ordermanagementservice;
 
-import com.ordermanagementservice.models.events.SubmitOrderEvent;
 import org.apache.kafka.clients.admin.AdminClientConfig;
 import org.apache.kafka.clients.admin.NewTopic;
-import org.apache.kafka.clients.producer.ProducerConfig;
-import org.apache.kafka.common.serialization.StringSerializer;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.config.TopicBuilder;
@@ -13,26 +11,27 @@ import org.springframework.kafka.core.KafkaAdmin;
 import java.util.HashMap;
 import java.util.Map;
 
+import static com.ordermanagementservice.constants.Constants.*;
+
 @Configuration
 public class KafkaTopicConfiguration {
+
+    @Value("${kafka.server.port}")
+    private String kafkaServerPort;
+
+
     @Bean
     public KafkaAdmin kafkaAdmin() {
         Map<String, Object> configs = new HashMap<>();
-        configs.put(AdminClientConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
-        configs.put(
-                ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG,
-                StringSerializer.class);
-        configs.put(
-                ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG,
-                SubmitOrderEvent.class);
+        configs.put(AdminClientConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaServerPort);
         return new KafkaAdmin(configs);
     }
 
     @Bean
     public NewTopic orderTopic() {
-        return TopicBuilder.name("order-topic")
-                .partitions(10)
-                .replicas(3)
+        return TopicBuilder.name(KAFKA_TOPIC)
+                .partitions(KAFKA_PARTITIONS)
+                .replicas(KAFKA_REPLICAS)
                 .compact()
                 .build();
     }
